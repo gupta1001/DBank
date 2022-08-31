@@ -1,19 +1,37 @@
 import { dbank } from "../../declarations/dbank";
 
-document.querySelector("form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const button = e.target.querySelector("button");
+window.addEventListener("load", async () => {
+  displayAmount();
+})
 
-  const name = document.getElementById("name").value.toString();
-
+document.querySelector("form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  let button = document.querySelector("#submit-btn");
   button.setAttribute("disabled", true);
 
-  // Interact with foo actor, calling the greet method
-  const greeting = await dbank.greet(name);
+  //for depositing the amount in the bank
+  let depositAmount = parseFloat(document.getElementById("input-amount").value);
+  if (document.getElementById("input-amount").value.length != 0){
+    await dbank.topUp(depositAmount);
+  }
+  document.getElementById("input-amount").value = ""
 
+  //for withdrawing the amount from the bank
+  let withdrawlAmount = parseFloat(document.getElementById("withdrawal-amount").value);
+  if (document.getElementById("withdrawal-amount").value.length != 0){
+    await dbank.withdrawl(withdrawlAmount);
+  }
+  document.getElementById("withdrawal-amount").value = ""
+
+  //compound the money
+  await dbank.compound();
+
+  //resetting the form
+  displayAmount();
   button.removeAttribute("disabled");
+})
 
-  document.getElementById("greeting").innerText = greeting;
-
-  return false;
-});
+async function displayAmount(){
+  let currentAmount = await dbank.checkBalance();
+  document.getElementById("value").innerText = currentAmount.toFixed(2);
+}
